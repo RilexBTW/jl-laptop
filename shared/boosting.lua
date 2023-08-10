@@ -1,12 +1,12 @@
 Config.Boosting = {}
 
-Config.Boosting.MinCops = 0
+Config.Boosting.MinCops = 1
 
-Config.Boosting.Notifications = "phone" -- Use this for qb // renewed phone intergration, use "notify" for normal QBCore Notifications // NWPD for New Phone Who Dis
+Config.Boosting.Notifications = "notify" -- Use this for qb // renewed phone intergration, use "notify" for normal QBCore Notifications // NWPD for New Phone Who Dis
 
 Config.Boosting.Debug = true -- Make this true to make boosting faster lmao
 
-Config.Boosting.HackingDevice = "phone" -- Whatever item you use to hack a car with
+Config.Boosting.HackingDevice = "laptop" -- Whatever item you use to hack a car with
 
 Config.Boosting.HackDelayMin = 30 -- Seconds
 Config.Boosting.HackDelayMax = 60 -- Seconds
@@ -25,7 +25,7 @@ Config.Boosting.PedSettings = {
     ["A"] = { weapons = { "weapon_pistol_mk2", "weapon_gusenberg" } },
     ["A+"] = { weapons = { "weapon_combatpistol", "weapon_machinepistol" } },
     ["S"] = { weapons = { "weapon_microsmg", "weapon_minismg" } },
-    ["S+"] = { weapons = { "weapon_assaultrifle", "weapon_combatmg" } },
+    ["S+"] = { weapons = { "weapon_assaultrifle", "weapon_compactrifle" } },
 }
 
 Config.Boosting.Locations = {
@@ -577,15 +577,15 @@ Config.Boosting.Price = {
 }
 
 Config.Boosting.RandomNames = {
-    "XgamerX",
-    "Just Lazzy",
-    "Zooster",
-    "Hype Squad",
-    "Lowkey Paul",
-    "Jimathy yorass",
-    "Paul Zac",
-    "Gov",
-    "Kareem",
+    "Abdul",
+    "Timothy James",
+    "Jarrad",
+    "Oof Squad",
+    "Terry Davis",
+    "Elliot Alderson",
+    "Daniel Keem",
+    "NotAFed",
+    "Karen",
 }
 
 Config.Boosting.MetaReward = {

@@ -216,7 +216,7 @@ QBCore.Functions.CreateCallback('jl-laptop:server:CanStartBoosting', function(so
     if not currentContracts[CID][id] then return cb("notfound") end
     if Config.RenewedPhone and not exports['qb-phone']:hasEnough(src, "gne", currentContracts[CID][id].cost) then
         return cb("notenough")
-    elseif not Config.RenewedPhone and Player.PlayerData.money.crypto < currentContracts[CID][id].cost then
+    elseif not Config.RenewedPhone and Player.PlayerData.money.bank < currentContracts[CID][id].cost then
         return cb("notenough")
     end
     local amount = 0
@@ -247,7 +247,7 @@ QBCore.Functions.CreateCallback('jl-laptop:server:CanStartBoosting', function(so
                 exports['qb-phone']:RemoveCrypto(src, "gne", currentContracts[CID][id].cost)
             else
                 if not
-                    Player.Functions.RemoveMoney("crypto", currentContracts[CID][id].cost,
+                    Player.Functions.RemoveMoney("bank", currentContracts[CID][id].cost,
                         Lang:t('boosting.info.bought_boost')) then
                     cb("busy")
                     return
@@ -496,6 +496,51 @@ RegisterNetEvent('jl-laptop:server:fuckvin', function(netid, model, mods)
     TriggerClientEvent('vehiclekeys:client:SetOwner', src, plate)
 end)
 
+
+QBCore.Commands.Add("seizevehicle", "Seize a vehicle from a player", {}, false, function(source, args)
+    local officer = QBCore.Functions.GetPlayer(source)
+    if officer and officer.PlayerData.job.name == 'police' then
+        local targetPlate = tostring(args[1])
+        
+        -- Check if the vehicle has a scratched VIN
+        MySQL.Async.fetchAll('SELECT citizenid, vinscratch FROM player_vehicles WHERE plate = ?', {targetPlate}, function(result)
+            if result and #result > 0 then
+                local ownerCitizenId = result[1].citizenid
+                local vinscratch = result[1].vinscratch
+                
+                if vinscratch == 1 then
+                    -- Get the owner's network ID from the citizen ID
+                    local ownerNetId = GetPlayerIdFromCitizenId(ownerCitizenId)
+                    
+                    if ownerNetId then
+                        -- Update the vehicle's ownership and state in the database
+                        MySQL.Async.execute('UPDATE player_vehicles SET owner = NULL, state = ? WHERE plate = ?', {1, targetPlate}, function(rowsChanged)
+                            if rowsChanged > 0 then
+                                local message = string.format('Vehicle with plate %s seized from owner with scratched VIN', targetPlate)
+                                TriggerClientEvent('QBCore:Notify', source, message, 'success')
+                                TriggerClientEvent('QBCore:Notify', ownerNetId, 'Your vehicle has been seized because it was found with a scratched VIN')
+                            else
+                                TriggerClientEvent('QBCore:Notify', source, 'Failed to seize the vehicle.', 'error')
+                            end
+                        end)
+                    else
+                        TriggerClientEvent('QBCore:Notify', source, 'Failed to retrieve owner information.', 'error')
+                    end
+                else
+                    TriggerClientEvent('QBCore:Notify', source, 'The provided vehicle still has a VIN intact.', 'error')
+                end
+            else
+                TriggerClientEvent('QBCore:Notify', source, 'No vehicle found with the specified plate.', 'error')
+            end
+        end)
+    else
+        TriggerClientEvent('QBCore:Notify', source, 'You are not authorized to use this command.', 'error')
+    end
+end)
+
+
+
+
 RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
@@ -513,11 +558,7 @@ RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
             currentRuns[CID].cost = math.random(1, 2) -- makes it so they can actually get GNE when the boost is Free
         end
         local reward = math.ceil(currentRuns[CID].cost * math.random(2, 3))
-        if Config.RenewedPhone then
-            exports['qb-phone']:AddCrypto(src, "gne", reward)
-        else
-            Player.Functions.AddMoney("crypto", reward, Lang:t('boosting.info.rewardboost'))
-        end
+        exports["lb-phone"]:AddCrypto(source, 'bitcoin', reward)
         Notify(src, Lang:t('boosting.success.received_reward', { reward = reward }), "success", 7500)
         if DoesEntityExist(NetworkGetEntityFromNetworkId(currentRuns[CID].NetID)) then
             DeleteEntity(NetworkGetEntityFromNetworkId(currentRuns[CID].NetID))
@@ -676,6 +717,8 @@ QBCore.Functions.CreateCallback('jl-laptop:server:GetContracts', function(source
 
     cb(currentContracts[CID])
 end)
+
+
 
 
 
@@ -863,6 +906,19 @@ CreateThread(function()
 end)
 
 
+    -- Function to get player's network ID from Citizen ID
+    local function GetPlayerIdFromCitizenId(citizenId)
+        local players = GetPlayers()
+        for _, playerId in ipairs(players) do
+            local player = tonumber(playerId)
+            local playerCitizenId = QBCore.Functions.GetPlayer(player).PlayerData.citizenid
+            if playerCitizenId == citizenId then
+                return player
+            end
+        end
+        return nil
+    end
+
 -- Player dropped functions --
 local function GetCID(src)
     if LookingForContracts then
@@ -947,6 +1003,50 @@ QBCore.Commands.Add('settier', Lang:t('boosting.command.command_tier_desc'),
             TriggerClientEvent('QBCore:Notify', source, Lang:t('boosting.command.incorrect_format'), "error", 5000)
         end
     end, "god")
+
+QBCore.Commands.Add("seizevehicle", "Seize a vehicle from a player", {}, false, function(source, args)
+    local officer = QBCore.Functions.GetPlayer(source)
+    if officer and officer.PlayerData.job.name == 'police' then
+        local targetPlate = tostring(args[1])
+        
+        -- Check if the vehicle has a scratched VIN
+        MySQL.Async.fetchAll('SELECT citizenid, vinscratch FROM player_vehicles WHERE plate = ?', {targetPlate}, function(result)
+            if result and #result > 0 then
+                local ownerCitizenId = result[1].citizenid
+                local vinscratch = result[1].vinscratch
+                
+                if vinscratch == 1 then
+                    -- Get the owner's network ID from the citizen ID
+                    local ownerNetId = GetPlayerIdFromCitizenId(ownerCitizenId)
+                    
+                    if ownerNetId then
+                        -- Remove the vehicle from the database
+                        MySQL.Async.execute('DELETE FROM player_vehicles WHERE plate = ?', {targetPlate}, function(rowsChanged)
+                            if rowsChanged > 0 then
+                                local message = string.format('Vehicle with plate %s seized from owner with scratched VIN', targetPlate)
+                                TriggerClientEvent('QBCore:Notify', source, message, 'success')
+                                TriggerClientEvent('QBCore:Notify', ownerNetId, 'Your vehicle has been seized because it was found with a scratched VIN')
+                            else
+                                TriggerClientEvent('QBCore:Notify', source, 'Failed to seize the vehicle.', 'error')
+                            end
+                        end)
+                    else
+                        TriggerClientEvent('QBCore:Notify', source, 'Failed to retrieve owner information.', 'error')
+                    end
+                else
+                    TriggerClientEvent('QBCore:Notify', source, 'The provided vehicle still has a VIN intact.', 'error')
+                end
+            else
+                TriggerClientEvent('QBCore:Notify', source, 'No vehicle found with the specified plate.', 'error')
+            end
+        end)
+    else
+        TriggerClientEvent('QBCore:Notify', source, 'You are not authorized to use this command.', 'error')
+    end
+end)
+    
+
+
 
 
 AddEventHandler("onServerResourceStart", function(resname)
