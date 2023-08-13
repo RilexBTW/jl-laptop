@@ -214,9 +214,7 @@ QBCore.Functions.CreateCallback('jl-laptop:server:CanStartBoosting', function(so
 
     if currentRuns[CID] then return cb("running") end
     if not currentContracts[CID][id] then return cb("notfound") end
-    if Config.RenewedPhone and not exports['qb-phone']:hasEnough(src, "gne", currentContracts[CID][id].cost) then
-        return cb("notenough")
-    elseif not Config.RenewedPhone and Player.PlayerData.money.bank < currentContracts[CID][id].cost then
+    if Player.PlayerData.money.bank < currentContracts[CID][id].cost then
         return cb("notenough")
     end
     local amount = 0
@@ -243,15 +241,10 @@ QBCore.Functions.CreateCallback('jl-laptop:server:CanStartBoosting', function(so
         }
 
         if SpawnCar(src) then
-            if Config.RenewedPhone then
-                exports['qb-phone']:RemoveCrypto(src, "gne", currentContracts[CID][id].cost)
-            else
-                if not
-                    Player.Functions.RemoveMoney("bank", currentContracts[CID][id].cost,
-                        Lang:t('boosting.info.bought_boost')) then
-                    cb("busy")
-                    return
-                end
+            if not Player.Functions.RemoveMoney("bank", currentContracts[CID][id].cost,
+                    Lang:t('boosting.info.bought_boost')) then
+                cb("busy")
+                return
             end
 
 
@@ -268,13 +261,6 @@ QBCore.Functions.CreateCallback('jl-laptop:server:CanStartBoosting', function(so
         cb("busy")
     end
 end)
-
-
-
-
-
-
-
 
 
 -- EVERYTHING TO DO WITH PEDS SPAWNING --
@@ -379,6 +365,7 @@ RegisterNetEvent('jl-laptop:server:SyncPlates', function(success)
 
     if success then
         if state.boostHacks - 1 >= 1 then
+            print('tracker is off')
             Notify(src, Lang:t('boosting.success.tracker_off', { tracker_left = newThing, time = randomSeconds }),
                 'success', 7500)
         end
@@ -497,50 +484,6 @@ RegisterNetEvent('jl-laptop:server:fuckvin', function(netid, model, mods)
 end)
 
 
-QBCore.Commands.Add("seizevehicle", "Seize a vehicle from a player", {}, false, function(source, args)
-    local officer = QBCore.Functions.GetPlayer(source)
-    if officer and officer.PlayerData.job.name == 'police' then
-        local targetPlate = tostring(args[1])
-        
-        -- Check if the vehicle has a scratched VIN
-        MySQL.Async.fetchAll('SELECT citizenid, vinscratch FROM player_vehicles WHERE plate = ?', {targetPlate}, function(result)
-            if result and #result > 0 then
-                local ownerCitizenId = result[1].citizenid
-                local vinscratch = result[1].vinscratch
-                
-                if vinscratch == 1 then
-                    -- Get the owner's network ID from the citizen ID
-                    local ownerNetId = GetPlayerIdFromCitizenId(ownerCitizenId)
-                    
-                    if ownerNetId then
-                        -- Update the vehicle's ownership and state in the database
-                        MySQL.Async.execute('UPDATE player_vehicles SET owner = NULL, state = ? WHERE plate = ?', {1, targetPlate}, function(rowsChanged)
-                            if rowsChanged > 0 then
-                                local message = string.format('Vehicle with plate %s seized from owner with scratched VIN', targetPlate)
-                                TriggerClientEvent('QBCore:Notify', source, message, 'success')
-                                TriggerClientEvent('QBCore:Notify', ownerNetId, 'Your vehicle has been seized because it was found with a scratched VIN')
-                            else
-                                TriggerClientEvent('QBCore:Notify', source, 'Failed to seize the vehicle.', 'error')
-                            end
-                        end)
-                    else
-                        TriggerClientEvent('QBCore:Notify', source, 'Failed to retrieve owner information.', 'error')
-                    end
-                else
-                    TriggerClientEvent('QBCore:Notify', source, 'The provided vehicle still has a VIN intact.', 'error')
-                end
-            else
-                TriggerClientEvent('QBCore:Notify', source, 'No vehicle found with the specified plate.', 'error')
-            end
-        end)
-    else
-        TriggerClientEvent('QBCore:Notify', source, 'You are not authorized to use this command.', 'error')
-    end
-end)
-
-
-
-
 RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
@@ -551,13 +494,14 @@ RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
 
     local boostData = Player.PlayerData.metadata["carboostrep"] or 0
     boostData += math.random(Config.Boosting.MetaReward[currentRuns[CID].contract].min,
-        Config.Boosting.MetaReward[currentRuns[CID].contract].max)
+    Config.Boosting.MetaReward[currentRuns[CID].contract].max)
     Player.Functions.SetMetaData('carboostrep', boostData)
     if not isvin then
         if currentRuns[CID].cost == 0 then
-            currentRuns[CID].cost = math.random(1, 2) -- makes it so they can actually get GNE when the boost is Free
+            currentRuns[CID].cost = math.random(0.2, 0.3) -- makes it so they can actually get GNE when the boost is Free
         end
-        local reward = math.ceil(currentRuns[CID].cost * math.random(2, 3))
+        local reward = math.ceil(currentRuns[CID].cost * math.random(0.6, 0.8))
+        print('rewarding crypto')
         exports["lb-phone"]:AddCrypto(source, 'bitcoin', reward)
         Notify(src, Lang:t('boosting.success.received_reward', { reward = reward }), "success", 7500)
         if DoesEntityExist(NetworkGetEntityFromNetworkId(currentRuns[CID].NetID)) then
@@ -567,8 +511,6 @@ RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
     currentRuns[CID] = nil
     TriggerClientEvent('jl-laptop:client:finishContract', src, currentContracts[CID])
 end)
-
-
 
 
 
@@ -901,7 +843,8 @@ CreateThread(function()
                 end
             end
         end
-        Wait(Config.Boosting.Debug and 200 or (math.random(1, 4) * 60000)) -- Once every 1 to 4 minutes
+        Wait(Config.Boosting.Debug and 200 or (1 * 60000)) -- Every 1 min to 2 minutes
+
     end
 end)
 

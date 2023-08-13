@@ -38,6 +38,7 @@ end
 
 -- ALL THE BLIP FUNCTIONS --
 local function DelayDelivery()
+    print('starting delayed delivery')
     SetTimeout(math.random(10, 30 * 1000), function()
         TriggerServerEvent('jl-laptop:server:FinalDestination')
     end)
@@ -121,17 +122,18 @@ end
 local AntiSpam = false -- Just a true / false boolean to not spam the shit out of the server.
 local carCoords = nil
 -- sends information from server to client that we found the car and we started lockpicking
-RegisterNetEvent('lockpicks:UseLockpick', function()
+RegisterNetEvent('wasabi_carlock:attemptLockpick', function()
     if AntiSpam then return end
     if not NetID then return end
     local car = NetworkGetEntityFromNetworkId(NetID)
     if DoesEntityExist(car) then
         local dist = #(GetEntityCoords(car) - GetEntityCoords(cache.ped))
-        if dist <= 3.5 then -- 2.5 is the distance in qbcore vehiclekeys if you use more or less then please edit this.
+        if dist <= 6.5 then -- 2.5 is the distance in qbcore vehiclekeys if you use more or less then please edit this.
             if #(vector3(carCoords.x, carCoords.y, carCoords.z) - GetEntityCoords(car)) <= 6.9 then
                 AntiSpam = true
                 TriggerServerEvent('jl-laptop:server:SpawnPed')
                 RemoveBlip(missionBlip)
+                print('lockpicking car')
                 UpdateBlips()
                 SendNUIMessage({
                     action = "boosting/setcancel",
@@ -708,7 +710,7 @@ end)
 
 
 RegisterNetEvent('jl-laptop:client:setvehicleFuel', function(veh)
-    exports['LegacyFuel']:SetFuel(car, 100.0)
+    exports['cdn-fuel']:SetFuel(car, 100.0)
 end)
 
 RegisterNUICallback("boosting/getqueue", function(_, cb)

@@ -1,15 +1,15 @@
 Config.Boosting = {}
 
-Config.Boosting.MinCops = 1
+Config.Boosting.MinCops = 0
 
 Config.Boosting.Notifications = "notify" -- Use this for qb // renewed phone intergration, use "notify" for normal QBCore Notifications // NWPD for New Phone Who Dis
 
 Config.Boosting.Debug = true -- Make this true to make boosting faster lmao
 
-Config.Boosting.HackingDevice = "laptop" -- Whatever item you use to hack a car with
+Config.Boosting.HackingDevice = "tracker_disabler" -- Whatever item you use to hack a car with
 
-Config.Boosting.HackDelayMin = 30 -- Seconds
-Config.Boosting.HackDelayMax = 60 -- Seconds
+Config.Boosting.HackDelayMin = 10 -- Seconds
+Config.Boosting.HackDelayMax = 15 -- Seconds
 
 
 Config.Boosting.Frequency = 60 -- Whats the max time for a boost ping for cops? - Standard 30 seconds
@@ -19,10 +19,10 @@ Config.Boosting.MaxBoosts = 5 -- The amount of boosts a player can hold in their
 Config.Boosting.MinusOne = true -- true or false, detmains wheather the Z is minus 1 or not.
 
 Config.Boosting.PedSettings = {
-    ["D"] = { weapons = { "weapon_bat", "weapon_pistol" } },
+    ["D"] = { weapons = { "weapon_bat", "weapon_hammer" } },
     ["C"] = { weapons = { "weapon_pistol_mk2", "weapon_pistol" } },
     ["B"] = { weapons = { "weapon_pistol_mk2", "weapon_pistol" } },
-    ["A"] = { weapons = { "weapon_pistol_mk2", "weapon_gusenberg" } },
+    ["A"] = { weapons = { "weapon_pistol_mk2", "weapon_doublebarrel" } },
     ["A+"] = { weapons = { "weapon_combatpistol", "weapon_machinepistol" } },
     ["S"] = { weapons = { "weapon_microsmg", "weapon_minismg" } },
     ["S+"] = { weapons = { "weapon_assaultrifle", "weapon_compactrifle" } },
@@ -567,7 +567,7 @@ Config.Boosting.TiersPerRep = {
 }
 
 Config.Boosting.Price = {
-    ["D"] = { min = 0, max = 3 },
+    ["D"] = { min = 250, max = 500 },
     ["C"] = { min = 5, max = 10 },
     ["B"] = { min = 10, max = 20 },
     ["A"] = { min = 15, max = 30 },
@@ -597,6 +597,7 @@ Config.Boosting.MetaReward = {
     ["S"] = { min = 2, max = 6 },
     ["S+"] = { min = 3, max = 7 },
 }
+
 
 Config.Boosting.ReturnLocation = {
     { coords = vector3(724.0, -579.48, 26.96), isBusy = false },

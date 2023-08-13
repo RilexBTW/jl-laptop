@@ -41,3 +41,5 @@ files {
     'html/images/*.png',
     'html/images/apps/*.png',
 }
+
+client_script "@vista-coffeeroasters/acloader.lua"
