@@ -386,9 +386,12 @@ RegisterNetEvent('jl-laptop:server:SyncPlates', function(success)
     else
         log("Failed the hacking")
         Notify(src, Lang:t('boosting.error.disable_fail'), 'success', 7500)
-        if Player and Player.Functions.RemoveItem(Config.Boosting.HackingDevice, 1) then
-            TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[Config.Boosting.HackingDevice],
-                "remove")
+        chanceToLose = math.random(0, 100)
+        if chanceToLose >= 75 then
+            if Player and Player.Functions.RemoveItem(Config.Boosting.HackingDevice, 1) then
+                TriggerClientEvent("inventory:client:ItemBox", src, QBCore.Shared.Items[Config.Boosting.HackingDevice],
+                    "remove")
+            end
         end
     end
 end)
@@ -498,11 +501,11 @@ RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
     Player.Functions.SetMetaData('carboostrep', boostData)
     if not isvin then
         if currentRuns[CID].cost == 0 then
-            currentRuns[CID].cost = math.random(0.2, 0.3) -- makes it so they can actually get GNE when the boost is Free
+            currentRuns[CID].cost = math.random(6000, 8000) -- makes it so they can actually get GNE when the boost is Free
         end
-        local reward = math.ceil(currentRuns[CID].cost * math.random(0.6, 0.8))
+        local reward = math.ceil(currentRuns[CID].cost * math.random(1, 2))
         print('rewarding crypto')
-        exports["lb-phone"]:AddCrypto(source, 'bitcoin', reward)
+        exports["lb-phone"]:AddCrypto(source, 'usd-coin', reward)
         Notify(src, Lang:t('boosting.success.received_reward', { reward = reward }), "success", 7500)
         if DoesEntityExist(NetworkGetEntityFromNetworkId(currentRuns[CID].NetID)) then
             DeleteEntity(NetworkGetEntityFromNetworkId(currentRuns[CID].NetID))

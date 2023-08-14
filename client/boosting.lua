@@ -191,7 +191,6 @@ RegisterNetEvent('jl-laptop:client:MissionStarted',
 
 RegisterNUICallback('boosting/start', function(data, cb)
     QBCore.Functions.TriggerCallback('jl-laptop:server:CanStartBoosting', function(result)
-        print(result)
         if result == "success" then
             --TriggerServerEvent('jl-laptop:server:StartBoosting', data.id, currentCops)
             cb({

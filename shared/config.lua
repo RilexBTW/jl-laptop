@@ -23,7 +23,7 @@ Config.Apps = {
         job = {},                  -- Must be a table
         bannedJobs = { "police" }, -- Must be a table { 'police' }
         gang = {},                 -- Must be a table { 'ballas' }
-        item = { "tracker_disabler" },          -- Must be a table { 'vpn' }
+        item = { "boosting_tools" },          -- Must be a table { 'vpn' }
         default = true            -- if true, it will be added by default, ignoring all the previously set parameters
     },
     ['setting'] = {
@@ -39,7 +39,7 @@ Config.Apps = {
         item = {},
         default = true
     },
-    ['bennys'] = {
+   --[[ ['bennys'] = {
         app = 'bennys',
         name = "Bennys Shop",
         icon = "fa-solid fa-shopping-cart",
@@ -50,8 +50,8 @@ Config.Apps = {
         bannedJobs = {},
         gang = {},
         item = {},
-        default = true
-    },
+        default = false
+    }, --]]
     ['darkweb'] = {
         app = 'darkweb',
         name = "Unknown",
