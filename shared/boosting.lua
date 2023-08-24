@@ -4,7 +4,7 @@ Config.Boosting.MinCops = 0
 
 Config.Boosting.Notifications = "notify" -- Use this for qb // renewed phone intergration, use "notify" for normal QBCore Notifications // NWPD for New Phone Who Dis
 
-Config.Boosting.Debug = true -- Make this true to make boosting faster lmao
+Config.Boosting.Debug = false -- Make this true to make boosting faster lmao
 
 Config.Boosting.HackingDevice = "electronickit" -- Whatever item you use to hack a car with
 
@@ -528,7 +528,7 @@ Config.Boosting.TiersPerRep = {
 
 Config.Boosting.Price = {
     ["D"] = { min = 250, max = 500 },
-    ["C"] = { min = 5, max = 10 },
+    ["C"] = { min = 6000, max = 8000 },
     ["B"] = { min = 10, max = 20 },
     ["A"] = { min = 15, max = 30 },
     ["A+"] = { min = 20, max = 45 },

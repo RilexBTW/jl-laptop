@@ -501,7 +501,7 @@ RegisterNetEvent('jl-laptop:server:finishBoost', function(netId, isvin)
     Player.Functions.SetMetaData('carboostrep', boostData)
     if not isvin then
         if currentRuns[CID].cost == 0 then
-            currentRuns[CID].cost = math.random(6000, 8000) -- makes it so they can actually get GNE when the boost is Free
+            currentRuns[CID].cost = math.random(3000, 4000) -- makes it so they can actually get GNE when the boost is Free
         end
         local reward = math.ceil(currentRuns[CID].cost * math.random(1, 2))
         print('rewarding crypto')
@@ -846,7 +846,7 @@ CreateThread(function()
                 end
             end
         end
-        Wait(Config.Boosting.Debug and 200 or (1 * 60000)) -- Every 1 min to 2 minutes
+        Wait(Config.Boosting.Debug and 200 or (1 * 15000)) -- Every 1 min to 2 minutes
 
     end
 end)

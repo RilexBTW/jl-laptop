@@ -39,7 +39,7 @@ end
 -- ALL THE BLIP FUNCTIONS --
 local function DelayDelivery()
     print('starting delayed delivery')
-    SetTimeout(math.random(10, 30 * 1000), function()
+    SetTimeout(math.random(5, 10 * 1000), function()
         TriggerServerEvent('jl-laptop:server:FinalDestination')
     end)
 end
